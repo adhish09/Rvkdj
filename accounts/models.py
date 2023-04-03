@@ -1,0 +1,56 @@
+from django.contrib.auth.models import AbstractUser
+from django.db import models
+from .managers import CustomUserManager
+
+
+#user model for application
+class User(AbstractUser):
+    # value to determine if user is verified
+    verified = models.BooleanField(default=False)
+
+    # unique phone number
+    phone_number = models.CharField(max_length=15, unique=True, blank=True, null=True)
+
+    name = models.CharField(max_length=255, blank=True, null=True)
+
+    email = models.EmailField(unique=True)
+
+    smart_card = models.CharField(max_length=255, blank=True, null=True)
+    address = models.TextField(blank=True, null=True)
+
+    city = models.CharField(max_length=255, blank=True, null=True)
+    state = models.CharField(max_length=255, blank=True, null=True)
+    
+    country = models.CharField(max_length=255, blank=True, null=True)
+
+    dob = models.DateTimeField(blank=True, null=True)
+
+    gender = models.CharField(max_length=25, blank=True, null=True)
+
+    age = models.IntegerField(blank=True, null=True)
+
+    profile_picture = models.ImageField(upload_to="profile_pictures", blank=True, null=True)
+
+
+
+
+    #remove username
+    username = None
+    first_name = None
+    last_name = None
+
+    objects = CustomUserManager()
+    REQUIRED_FIELDS = []
+    USERNAME_FIELD = "email"
+
+
+    def __str__(self):
+        return self.email
+
+    # allow phone number to be blank but unique
+    def clean(self):
+        if self.phone_number is not None and len(self.phone_number.strip()) == 0:
+            self.phone_number = None
+
+
+
