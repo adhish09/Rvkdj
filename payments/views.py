@@ -1,5 +1,4 @@
 import hashlib
-import payu
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -36,10 +35,7 @@ class DonationView(APIView):
                 'surl': 'http://localhost:8000/donation-success/',
                 'furl': 'http://localhost:8000/donation-failure/',
             }
-            hash_string = create_hash(payment_data)
-            payment_data['hash'] = hash_string
-            payment = payu.Payments(**payment_data)
-            response = payment.create()
+          
 
             # check response status and return redirect URL
             if response.status == 'SUCCESS':
