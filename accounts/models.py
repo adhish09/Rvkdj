@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from .managers import CustomUserManager
+import uuid
 
 
 #user model for application
@@ -54,3 +55,12 @@ class User(AbstractUser):
 
 
 
+
+class UserVerification(models.Model):
+    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    used = models.BooleanField(default=False)
+
+    
+    def __str__(self):
+        return str(self.token)

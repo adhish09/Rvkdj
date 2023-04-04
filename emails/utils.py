@@ -7,7 +7,7 @@ import threading
 from django import template
 
 
-SENDGRID_CLIENT = SendGridAPIClient(api_key='apikey')
+SENDGRID_CLIENT = SendGridAPIClient(api_key='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')
 FROM_EMAIL = "namangalabernard@gmail.com"
 
 
@@ -25,6 +25,22 @@ class EmailThread(threading.Thread):
 
 
 def send_email(email_type, subject, recipients, object=None, *args, **kwargs):
+    if email_type == "user_verification_email":
+        user = object
+
+        user_verification_context = {
+            "user": user,
+            "token":kwargs.get("token")
+        }
+
+
+        plain_message = render_to_string('email_templates/user_verify_email.txt',
+                                         user_verification_context)
+
+        # html message
+        html_message = render_to_string('email_templates/user_verify_email.html',
+                                        user_verification_context)
+        
    
     to_email = To(recipients)
 

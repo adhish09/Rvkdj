@@ -2,12 +2,15 @@ from django.contrib.auth.hashers import make_password
 from rest_framework import viewsets
 from django.contrib.auth import get_user_model
 from rest_framework.filters import SearchFilter, OrderingFilter
-from rest_framework.permissions import  IsAuthenticated
+from rest_framework.permissions import  IsAuthenticated, AllowAny
 from .serializers import  UserSerializer, UserGetSerializer
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.parsers import MultiPartParser, JSONParser
+from rest_framework.decorators import action
+from .models import UserVerification
+
 
 User = get_user_model()
 
@@ -48,6 +51,31 @@ class AccountViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
 
+
+    @action(detail=False, methods=['POST'], name='verify_user', url_path="verify-user", parser_classes=[JSONParser])
+    def verify_user(self, request):
+        token = request.data.get('token', None)
+
+        if token is not None:
+            user_verification = UserVerification.objects.get(token=token)
+
+            # check if link has already been used
+
+            if user_verification.used == True:
+                    # send error
+                    return Response({"used": "Link has already been used"})
+            else:
+                user = user_verification.user
+                user.verified = True
+
+                user.save()
+
+                user_verification.used = True
+                user_verification.save()
+
+                return Response({"verified": True})
+        else:
+            return Response({"error": "Something went wrong!"})
 
     # @action(detail=False, methods=['POST'], name='forgot_password')
     # def forgot_password(self, request, *args, **kwargs):
